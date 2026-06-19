@@ -1,0 +1,28 @@
+{
+  "name": "dbsqlfmt",
+  "version": "0.1.0",
+  "description": "SQL formatter CLI tool",
+  "bin": {
+    "dbsqlfmt": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sql",
+    "formatter",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "commander": "^13.1.0",
+    "sql-formatter": "^15.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "typescript": "^6.0.3"
+  }
+}
