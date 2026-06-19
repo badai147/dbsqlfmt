@@ -71,16 +71,22 @@ dbsqlfmt format query.sql --language mysql --uppercase
 dbsqlfmt format query.sql --dry-run
 ```
 
+**dbeaver 格式化命令行**
+
+```bash
+dbsqlfmt.cmd format ${file} --dry-run
+```
+
 ## 选项
 
-| 选项 | 描述 | 默认值 |
-|------|------|--------|
-| `-l, --language <lang>` | SQL 方言 | `sql` |
-| `-i, --indent <size>` | 缩进空格数 | `2` |
-| `-u, --uppercase` | 将关键字转为大写 | 关闭 |
-| `--dry-run` | 仅输出到终端，不改写文件 | 关闭 |
-| `-V, --version` | 查看版本号 | |
-| `-h, --help` | 查看帮助信息 | |
+| 选项                    | 描述                     | 默认值 |
+| ----------------------- | ------------------------ | ------ |
+| `-l, --language <lang>` | SQL 方言                 | `sql`  |
+| `-i, --indent <size>`   | 缩进空格数               | `2`    |
+| `-u, --uppercase`       | 将关键字转为大写         | 关闭   |
+| `--dry-run`             | 仅输出到终端，不改写文件 | 关闭   |
+| `-V, --version`         | 查看版本号               |        |
+| `-h, --help`            | 查看帮助信息             |        |
 
 ## 配置文件
 
