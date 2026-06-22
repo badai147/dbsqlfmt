@@ -1,10 +1,11 @@
 # dbsqlfmt
 
+![Version](https://img.shields.io/badge/version-0.1.1-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.x-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-**dbsqlfmt** 是一个基于 [sql-formatter](https://github.com/sql-formatter-org/sql-formatter) 的 SQL 格式化 CLI 工具，支持多种 SQL 方言、配置文件、关键字大写等特性。
+**dbsqlfmt** 是一个基于 [sql-formatter](https://github.com/sql-formatter-org/sql-formatter) 的 SQL 格式化 CLI 工具，支持 MySQL、PostgreSQL 两种方言，支持配置文件、关键字大写等特性。
 
 ## 目录
 
@@ -20,7 +21,7 @@
 ## 特性
 
 - 格式化单个 SQL 文件（不限制文件后缀）
-- 支持 20+ 种 SQL 方言（MySQL、PostgreSQL、BigQuery 等）
+- 支持 MySQL 和 PostgreSQL 两种方言
 - 可自定义缩进大小
 - 关键字大写选项
 - Dry-run 预览模式，不改写文件
@@ -62,7 +63,7 @@ dbsqlfmt format query.sql
 **指定方言 + 关键字大写：**
 
 ```bash
-dbsqlfmt format query.sql --language mysql --uppercase
+dbsqlfmt format query.sql --language postgresql --uppercase
 ```
 
 **仅预览结果，不写回文件：**
@@ -71,17 +72,17 @@ dbsqlfmt format query.sql --language mysql --uppercase
 dbsqlfmt format query.sql --dry-run
 ```
 
-**dbeaver 格式化命令行**
+**DBeaver 外部工具配置：**
 
 ```bash
-dbsqlfmt.cmd format ${file} --dry-run
+dbsqlfmt format "${file}" --dry-run
 ```
 
 ## 选项
 
 | 选项                    | 描述                     | 默认值 |
 | ----------------------- | ------------------------ | ------ |
-| `-l, --language <lang>` | SQL 方言                 | `sql`  |
+| `-l, --language <lang>` | SQL 方言（`mysql` / `postgresql`） | `mysql` |
 | `-i, --indent <size>`   | 缩进空格数               | `2`    |
 | `-u, --uppercase`       | 将关键字转为大写         | 关闭   |
 | `--dry-run`             | 仅输出到终端，不改写文件 | 关闭   |
@@ -104,7 +105,7 @@ CLI 命令行选项会覆盖配置文件中的同名设置。
 
 ## 支持的方言
 
-`sql` `bigquery` `clickhouse` `db2` `db2i` `duckdb` `hive` `mariadb` `mysql` `tidb` `n1ql` `plsql` `postgresql` `redshift` `spark` `sqlite` `trino` `transactsql` `singlestoredb` `snowflake` `tsql`
+`mysql` `postgresql`
 
 ## 开发
 
@@ -140,7 +141,6 @@ dbsqlfmt/
 │   ├── formatter.ts  # sql-formatter 封装
 │   ├── config.ts     # 配置文件加载与合并
 │   └── utils.ts      # 文件读写工具函数
-├── .dbsqlfmtrc       # 配置文件（可选）
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json

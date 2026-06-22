@@ -1,11 +1,12 @@
 {
   "name": "dbsqlfmt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "SQL formatter CLI tool",
   "bin": {
     "dbsqlfmt": "./dist/cli.js"
   },
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

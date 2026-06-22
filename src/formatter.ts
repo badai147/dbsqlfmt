@@ -8,7 +8,7 @@ export interface FormatOptions {
 
 export function formatSql(sql: string, options: FormatOptions = {}): string {
   return format(sql, {
-    language: (options.language || 'sql') as SqlLanguage,
+    language: (options.language || 'mysql') as SqlLanguage,
     tabWidth: Number(options.indent) || 2,
     keywordCase: options.uppercase ? 'upper' : 'preserve',
   });

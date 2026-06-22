@@ -19,5 +19,8 @@ function loadConfig(cwd: string): Config {
 
 export function mergeConfig(cliOptions: Config): Config {
   const fileConfig = loadConfig(process.cwd());
-  return { ...fileConfig, ...cliOptions };
+  const cleanCli = Object.fromEntries(
+    Object.entries(cliOptions).filter(([_, v]) => v !== undefined)
+  );
+  return { ...fileConfig, ...cleanCli };
 }

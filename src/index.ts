@@ -8,7 +8,7 @@ export function formatFile(filePath: string, cliOptions: Config): void {
     const sql = readFile(filePath);
     const formatted = formatSql(sql, options);
     if (options.dryRun) {
-      print(formatted);
+      print(formatted + '\n');
     } else {
       writeFile(filePath, formatted);
       print(`Formatted: ${filePath}\n`);

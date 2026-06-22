@@ -15,7 +15,7 @@ program
 program
   .command('format <file>')
   .description('Format a SQL file')
-  .option('-l, --language <lang>', 'SQL dialect (sql, mysql, postgresql, etc.)', 'sql')
+  .option('-l, --language <lang>', 'SQL dialect (mysql, postgresql)')
   .option('-i, --indent <size>', 'Indent size', '2')
   .option('-u, --uppercase', 'Uppercase keywords')
   .option('--dry-run', 'Print formatted SQL to stdout without overwriting')
