@@ -9,7 +9,7 @@ const program = new Command();
 
 program
   .name('dbsqlfmt')
-  .description('SQL formatter CLI tool')
+  .description('SQL formatter CLI tool (default dialect: mysql)')
   .version(pkg.version);
 
 program
@@ -22,5 +22,18 @@ program
   .action((file: string, options: Record<string, unknown>) => {
     formatFile(file, options);
   });
+
+program.addHelpText('after', `
+Format Options:
+  -l, --language <lang>  SQL dialect (mysql, postgresql)  [default: mysql]
+  -i, --indent <size>    Indent size                      [default: 2]
+  -u, --uppercase        Uppercase keywords
+  --dry-run              Print formatted SQL to stdout without overwriting
+
+Examples:
+  dbsqlfmt format query.sql                   Default mysql dialect
+  dbsqlfmt format query.sql -l postgresql -u  PostgreSQL + uppercase
+  dbsqlfmt format query.sql --dry-run         Preview without modifying
+`);
 
 program.parse(process.argv);
