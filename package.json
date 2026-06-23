@@ -1,29 +1,47 @@
 {
-  "name": "dbsqlfmt",
-  "version": "0.1.1",
+  "name": "@badai147/dbsqlfmt",
+  "version": "0.1.2",
   "description": "SQL formatter CLI tool",
   "bin": {
-    "dbsqlfmt": "./dist/cli.js"
+    "dbsqlfmt": "dist/cli.js"
   },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
-    "prepare": "npm run build",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepublishOnly": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "sql",
     "formatter",
     "cli"
   ],
-  "author": "",
+  "author": "badai147",
   "license": "MIT",
   "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/badai147/dbsqlfmt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/badai147/dbsqlfmt/issues"
+  },
+  "homepage": "https://github.com/badai147/dbsqlfmt#readme",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "commander": "^13.1.0",
     "sql-formatter": "^15.4.7"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }

@@ -9,7 +9,7 @@ const program = new Command();
 
 program
   .name('dbsqlfmt')
-  .description('SQL formatter CLI tool (default dialect: mysql)')
+  .description('SQL formatter CLI tool (auto-detect mysql / postgresql)')
   .version(pkg.version);
 
 program
@@ -25,7 +25,7 @@ program
 
 program.addHelpText('after', `
 Format Options:
-  -l, --language <lang>  SQL dialect (mysql, postgresql)  [default: mysql]
+  -l, --language <lang>  SQL dialect (mysql, postgresql)  [default: auto-detect]
   -i, --indent <size>    Indent size                      [default: 2]
   -u, --uppercase        Uppercase keywords
   --dry-run              Print formatted SQL to stdout without overwriting

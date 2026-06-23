@@ -1,4 +1,5 @@
 import { format, type SqlLanguage } from 'sql-formatter';
+import { detectDialect } from './detect';
 
 export interface FormatOptions {
   language?: string;
@@ -7,8 +8,11 @@ export interface FormatOptions {
 }
 
 export function formatSql(sql: string, options: FormatOptions = {}): string {
+  const language: SqlLanguage = options.language
+    ? (options.language as SqlLanguage)
+    : detectDialect(sql);
   return format(sql, {
-    language: (options.language || 'mysql') as SqlLanguage,
+    language,
     tabWidth: Number(options.indent) || 2,
     keywordCase: options.uppercase ? 'upper' : 'preserve',
   });
