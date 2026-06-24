@@ -1,6 +1,6 @@
 {
   "name": "@badai147/dbsqlfmt",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "SQL formatter CLI tool",
   "bin": {
     "dbsqlfmt": "dist/cli.js"

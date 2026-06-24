@@ -20,7 +20,13 @@ program
   .option('-u, --uppercase', 'Uppercase keywords')
   .option('--dry-run', 'Print formatted SQL to stdout without overwriting')
   .action((file: string, options: Record<string, unknown>) => {
-    formatFile(file, options);
+    try {
+      formatFile(file, options);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`Error: ${message}`);
+      process.exit(1);
+    }
   });
 
 program.addHelpText('after', `

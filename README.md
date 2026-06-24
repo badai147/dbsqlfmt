@@ -1,6 +1,6 @@
 # dbsqlfmt
 
-![Version](https://img.shields.io/badge/version-0.1.2-blue)
+![Version](https://img.shields.io/badge/version-0.1.3-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.x-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -159,6 +159,10 @@ dbsqlfmt/
 ├── tsconfig.json
 └── README.md
 ```
+
+## 更新日志
+
+详见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 许可证
 

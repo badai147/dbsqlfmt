@@ -18,6 +18,9 @@ npm run test:watch
 |---|---|---|
 | `detect.test.ts` | 60 | `detectDialect()` 单元测试，验证每个方言特征模式的精确匹配 |
 | `formatter.test.ts` | 9 | `formatSql()` 集成测试，验证方言检测与格式化的端到端流程 |
+| `config.test.ts` | 6 | `mergeConfig()` 测试：配置加载、键白名单过滤、CLI 覆盖优先级、大文件拒绝 |
+| `utils.test.ts` | 6 | `readFile()` / `writeFile()` 测试：文件校验、符号链接拒绝、超大文件 |
+| `index.test.ts` | 5 | `formatFile()` 端到端测试：格式化写入、dryRun、自动检测、错误传播 |
 
 ## 覆盖范围
 
@@ -38,6 +41,27 @@ npm run test:watch
 | 自动检测 | 2 | 不传 language 时自动识别 MySQL（反引号）和 PG（`::`） |
 | 格式化选项 | 2 | `uppercase` 开关、`indent` 缩进 |
 | 端到端 | 2 | 真实复杂 SQL 全流程 |
+
+### config.test.ts
+
+| 分类 | 用例数 | 内容 |
+|---|---|---|
+| 基本合并 | 3 | 无配置文件、CLI 覆盖、CLI undefined 忽略 |
+| 安全过滤 | 2 | 键白名单过滤、无效 JSON 容错 |
+| DoS 防护 | 1 | 超大配置文件拒绝 |
+
+### utils.test.ts
+
+| 分类 | 用例数 | 内容 |
+|---|---|---|
+| readFile | 4 | 正常读取、不存在文件、目录路径、超大文件 |
+| writeFile | 2 | 正常写入、符号链接拒绝 |
+
+### index.test.ts
+
+| 分类 | 用例数 | 内容 |
+|---|---|---|
+| formatFile | 5 | 格式化写入、dryRun 只读、错误传播、自动检测、uppercase 选项 |
 
 ## 添加测试的原则
 
