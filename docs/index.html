@@ -3,280 +3,560 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>dbsqlfmt — SQL 格式化工具</title>
+  <title>dbsqlfmt — SQL Formatter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --border: #334155;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent2: #a78bfa;
-      --green: #4ade80;
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'DM Sans',sans-serif;
+      background:#08090e;
+      color:#eeedea;
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale
+    }
+    :root{
+      --bg:#08090e;
+      --surface:#101117;
+      --surface-2:#181a22;
+      --border:#232631;
+      --text:#eeedea;
+      --text-muted:#83848e;
+      --accent:#d4a853;
+      --accent-dim:#8b6d35;
+      --accent-glow:rgba(212,168,83,0.1);
+      --accent-teal:#2dd4bf;
+      --code-bg:#0c0d13;
+      --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E")
+    }
+    .container{max-width:1040px;margin:0 auto;padding:0 24px}
+
+    /* ── nav ── */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      background:rgba(8,9,14,0.7);
+      border-bottom:1px solid rgba(35,38,49,0.5)
+    }
+    nav .container{
+      display:flex;align-items:center;justify-content:space-between;
+      height:56px
+    }
+    .nav-logo{
+      font-family:'Bricolage Grotesque',sans-serif;
+      font-weight:700;font-size:1.15rem;
+      color:var(--text);text-decoration:none;
+      letter-spacing:-0.02em
+    }
+    .nav-logo span{color:var(--accent)}
+    .nav-links{display:flex;gap:24px;align-items:center}
+    .nav-links a{
+      font-size:0.85rem;font-weight:500;color:var(--text-muted);
+      text-decoration:none;transition:color .2s
+    }
+    .nav-links a:hover{color:var(--text)}
+    .nav-links .btn-small{
+      font-size:0.8rem;font-weight:600;
+      padding:6px 16px;border-radius:6px;
+      background:var(--accent);color:#08090e;
+      text-decoration:none;transition:opacity .2s
+    }
+    .nav-links .btn-small:hover{opacity:.85}
+
+    /* ── hero ── */
+    .hero{
+      position:relative;overflow:hidden;
+      padding:140px 0 80px;
+      background:
+        radial-gradient(ellipse 70% 55% at 50% -10%, rgba(212,168,83,0.06), transparent),
+        var(--bg)
+    }
+    .hero::before{
+      content:'';position:absolute;inset:0;
+      background-image:
+        linear-gradient(rgba(35,38,49,0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(35,38,49,0.3) 1px, transparent 1px);
+      background-size:56px 56px;
+      pointer-events:none;
+      -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 70%);
+      mask-image:radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 70%)
+    }
+    .hero::after{
+      content:'';position:absolute;inset:0;
+      background:var(--grain);
+      pointer-events:none
+    }
+    .hero-watermark{
+      position:absolute;font-family:'Bricolage Grotesque',sans-serif;
+      font-weight:800;font-size:min(28vw,360px);line-height:1;
+      color:rgba(212,168,83,0.025);
+      top:50%;left:50%;transform:translate(-50%,-50%);
+      pointer-events:none;user-select:none;
+      white-space:nowrap;text-align:center;
+      letter-spacing:-0.04em
+    }
+    .hero .container{position:relative;z-index:1;text-align:center}
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 14px;border-radius:100px;
+      font-size:.75rem;font-weight:600;letter-spacing:.03em;
+      text-transform:uppercase;
+      background:rgba(212,168,83,0.08);
+      border:1px solid rgba(212,168,83,0.15);
+      color:var(--accent);margin-bottom:20px
+    }
+    .hero h1{
+      font-family:'Bricolage Grotesque',sans-serif;
+      font-weight:800;font-size:clamp(2.8rem,7vw,5.2rem);
+      letter-spacing:-0.03em;line-height:1.05;
+      margin-bottom:16px
+    }
+    .hero h1 .accent{color:var(--accent)}
+    .hero .sub{
+      font-size:clamp(1.05rem,2vw,1.25rem);
+      color:var(--text-muted);max-width:520px;margin:0 auto 16px
+    }
+    .hero .tags{
+      display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+      margin-bottom:28px
+    }
+    .hero .tags span{
+      font-size:.75rem;font-weight:500;color:var(--text-muted);
+      padding:2px 12px;border-radius:4px;
+      background:rgba(35,38,49,0.4)
+    }
+    .hero-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+    .hero-badges img{height:20px;border-radius:3px}
+    .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:11px 28px;border-radius:8px;
+      font-size:.9rem;font-weight:600;text-decoration:none;
+      transition:all .25s;cursor:pointer;border:none
+    }
+    .btn-primary{
+      background:var(--accent);color:#08090e
+    }
+    .btn-primary:hover{
+      background:#e0b85e;transform:translateY(-1px);
+      box-shadow:0 8px 24px rgba(212,168,83,0.25)
+    }
+    .btn-secondary{
+      background:var(--surface);color:var(--text);
+      border:1px solid var(--border)
+    }
+    .btn-secondary:hover{
+      background:var(--surface-2);transform:translateY(-1px);
+      border-color:var(--text-muted)
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ── terminal widget ── */
+    .terminal-widget{
+      max-width:680px;margin:0 auto;
+      background:var(--code-bg);
+      border:1px solid var(--border);
+      border-radius:10px;overflow:hidden;
+      text-align:left;
+      box-shadow:0 12px 48px rgba(0,0,0,0.3)
+    }
+    .term-header{
+      display:flex;align-items:center;gap:8px;
+      padding:10px 14px;
+      background:rgba(24,26,34,0.8);
+      border-bottom:1px solid var(--border)
+    }
+    .term-dot{width:9px;height:9px;border-radius:50%}
+    .term-dot.r{background:#ff5f57}
+    .term-dot.y{background:#febc2e}
+    .term-dot.g{background:#28c840}
+    .term-title{
+      font-size:.75rem;color:var(--text-muted);margin-left:auto
+    }
+    .term-body{padding:16px 20px;overflow-x:auto}
+    .term-body pre{font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.65;color:#c9d1d9}
+    .term-body .kw{color:#ff7b72}
+    .term-body .fn{color:#79c0ff}
+    .term-body .str{color:#a5d6ff}
+    .term-body .op{color:#ffa657}
+    .term-body .cm{color:rgba(139,148,158,0.5)}
+    .term-body .accent{color:var(--accent)}
+    .term-cursor{
+      display:inline-block;width:7px;height:1.1em;
+      background:var(--accent);vertical-align:text-bottom;
+      animation:blink 1s step-end infinite;margin-left:4px
+    }
+    @keyframes blink{50%{opacity:0}}
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
+    /* ── sections ── */
+    section{padding:96px 0}
+    .section-label{
+      font-size:.75rem;font-weight:700;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--accent);
+      margin-bottom:12px
     }
-
-    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
-
-    /* Hero */
-    .hero {
-      padding: 80px 0 60px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
+    .section-title{
+      font-family:'Bricolage Grotesque',sans-serif;
+      font-weight:700;font-size:clamp(1.6rem,3.5vw,2.4rem);
+      letter-spacing:-0.02em;margin-bottom:8px
     }
-    .hero h1 {
-      font-size: 3rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero p {
-      font-size: 1.2rem;
-      color: var(--muted);
-      margin-top: 16px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .hero-badges {
-      margin-top: 24px;
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .hero-badges img { height: 22px; }
-
-    .hero-actions {
-      margin-top: 32px;
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 24px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .btn:hover { opacity: 0.85; }
-    .btn-primary {
-      background: var(--accent);
-      color: #0f172a;
-    }
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
+    .section-desc{
+      font-size:1rem;color:var(--text-muted);
+      max-width:500px;margin-bottom:48px
     }
 
-    /* Sections */
-    section { padding: 60px 0; }
-    section + section { border-top: 1px solid var(--border); }
-
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 24px;
+    /* ── features ── */
+    .features-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:16px
+    }
+    .feature-card{
+      position:relative;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:10px;padding:28px 24px;
+      transition:all .3s;overflow:hidden
+    }
+    .feature-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--accent),var(--accent-dim));
+      opacity:.6;transition:opacity .3s
+    }
+    .feature-card:hover{
+      border-color:rgba(212,168,83,0.2);
+      transform:translateY(-2px);
+      box-shadow:0 8px 32px rgba(0,0,0,0.2)
+    }
+    .feature-card:hover::before{opacity:1}
+    .feature-icon{
+      display:flex;align-items:center;justify-content:center;
+      width:36px;height:36px;border-radius:8px;
+      background:rgba(212,168,83,0.08);
+      border:1px solid rgba(212,168,83,0.12);
+      color:var(--accent);font-size:1rem;
+      margin-bottom:16px
+    }
+    .feature-tag{
+      display:inline-block;
+      font-size:.65rem;font-weight:600;letter-spacing:.04em;
+      text-transform:uppercase;color:var(--accent-dim);
+      margin-bottom:8px
+    }
+    .feature-card h3{
+      font-family:'Bricolage Grotesque',sans-serif;
+      font-weight:700;font-size:1.05rem;
+      margin-bottom:6px
+    }
+    .feature-card p{
+      font-size:.88rem;color:var(--text-muted);line-height:1.6
     }
 
-    /* Features */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
+    /* ── install ── */
+    .install-block{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:10px;overflow:hidden
     }
-    .feature-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
+    .install-header{
+      display:flex;align-items:center;
+      padding:8px 16px;
+      background:rgba(24,26,34,0.6);
+      border-bottom:1px solid var(--border);
+      font-family:'JetBrains Mono',monospace;
+      font-size:.72rem;color:var(--text-muted)
     }
-    .feature-card h3 {
-      font-size: 1rem;
-      color: var(--accent);
-      margin-bottom: 8px;
+    .install-header .prompt{color:var(--accent);margin-right:8px}
+    .install-body{
+      padding:16px 20px;
+      font-family:'JetBrains Mono',monospace;
+      font-size:.88rem;line-height:1.7
     }
-    .feature-card p {
-      font-size: 0.9rem;
-      color: var(--muted);
+    .install-body .line{display:flex;align-items:center;gap:8px}
+    .install-body .prompt{color:var(--accent)}
+    .install-body .cmd{color:#e6e1cf}
+    .install-body .comment{color:rgba(139,148,158,0.5);font-size:.78rem}
+    .install-body .output{color:var(--text-muted);font-size:.78rem;margin-left:calc(1ch + 8px)}
+    .install-cursor{
+      display:inline-block;width:7px;height:1em;
+      background:var(--accent);vertical-align:text-bottom;
+      animation:blink 1s step-end infinite;margin-left:2px
     }
 
-    /* Install */
-    code, pre {
-      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    /* ── usage ── */
+    .usage-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      gap:12px
     }
-    .code-block {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 20px;
-      overflow-x: auto;
-      font-size: 0.9rem;
-      margin: 12px 0;
+    .usage-item{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:10px;padding:20px 24px;
+      transition:all .25s
     }
-    .code-block .comment { color: #64748b; }
-    .code-block .keyword { color: var(--accent); }
-    .code-block .string { color: var(--green); }
+    .usage-item:hover{
+      border-color:rgba(212,168,83,0.15);
+      box-shadow:0 4px 20px rgba(0,0,0,0.15)
+    }
+    .usage-label{
+      font-size:.68rem;font-weight:700;letter-spacing:.05em;
+      text-transform:uppercase;color:var(--accent-dim);
+      margin-bottom:8px
+    }
+    .usage-code{
+      font-family:'JetBrains Mono',monospace;
+      font-size:.82rem;color:#e6e1cf;
+      background:var(--code-bg);
+      border:1px solid var(--border);
+      border-radius:6px;padding:10px 14px;
+      overflow-x:auto;margin-top:6px
+    }
+    .usage-desc{
+      font-size:.85rem;color:var(--text-muted);
+      margin-top:8px
+    }
 
-    /* Usage */
-    .usage-grid {
-      display: grid;
-      gap: 16px;
+    /* ── options ── */
+    .options-table{
+      width:100%;border-collapse:collapse;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:10px;overflow:hidden;
+      font-size:.88rem
     }
-    .usage-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
+    .options-table th{
+      font-size:.7rem;font-weight:700;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--text-muted);
+      text-align:left;padding:12px 20px;
+      background:rgba(24,26,34,0.5);
+      border-bottom:1px solid var(--border)
     }
-    .usage-item .label {
-      font-size: 0.8rem;
-      color: var(--accent2);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .options-table td{
+      padding:12px 20px;
+      border-bottom:1px solid rgba(35,38,49,0.4);
+      color:var(--text-muted)
     }
-    .usage-item p { margin-top: 8px; color: var(--muted); font-size: 0.9rem; }
+    .options-table tr:last-child td{border-bottom:none}
+    .options-table td:first-child{
+      font-family:'JetBrains Mono',monospace;
+      font-size:.82rem;color:var(--accent);
+      white-space:nowrap
+    }
+    .options-table td:last-child{
+      color:var(--text);font-weight:500
+    }
+    .options-table tr:hover td{background:rgba(212,168,83,0.02)}
 
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 40px 0;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.85rem;
+    /* ── footer ── */
+    footer{
+      border-top:1px solid var(--border);
+      padding:40px 0;
+      text-align:center;
+      font-size:.82rem;color:var(--text-muted)
     }
-    footer a { color: var(--accent); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+    footer a{color:var(--accent);text-decoration:none;transition:color .2s}
+    footer a:hover{color:#e0b85e;text-decoration:underline}
 
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 2rem; }
-      .hero { padding: 48px 0 40px; }
-      section { padding: 40px 0; }
+    /* ── reveal animation ── */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .reveal-d1{transition-delay:0.05s}
+    .reveal-d2{transition-delay:0.12s}
+    .reveal-d3{transition-delay:0.2s}
+    .reveal-d4{transition-delay:0.28s}
+
+    /* ── responsive ── */
+    @media(max-width:768px){
+      nav .container{height:48px}
+      .nav-links a:not(.btn-small){display:none}
+      .hero{padding:100px 0 56px}
+      section{padding:64px 0}
+      .features-grid{grid-template-columns:1fr}
+      .usage-grid{grid-template-columns:1fr}
+      .options-table td,.options-table th{padding:10px 14px}
+      .options-table td:first-child{font-size:.78rem}
+    }
+    @media(max-width:480px){
+      .hero h1{font-size:2.2rem}
+      .terminal-widget{margin:0 -12px;border-radius:0}
+      .term-body{padding:12px 14px}
+      .term-body pre{font-size:.75rem}
     }
   </style>
 </head>
 <body>
-  <div class="hero">
-    <div class="container">
-      <h1>dbsqlfmt</h1>
-      <p>SQL 格式化命令行工具，支持 MySQL / PostgreSQL，自动识别方言</p>
-      <div class="hero-badges">
-        <img src="https://img.shields.io/badge/version-0.1.3-blue" alt="version">
-        <img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="node">
-        <img src="https://img.shields.io/badge/license-MIT-blue" alt="license">
-      </div>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="https://github.com/badai147/dbsqlfmt" target="_blank">GitHub</a>
-        <a class="btn btn-secondary" href="https://www.npmjs.com/package/@badai147/dbsqlfmt" target="_blank">npm</a>
-      </div>
-    </div>
-  </div>
 
+<nav>
   <div class="container">
-    <section>
-      <h2>特性</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <h3>双方言</h3>
-          <p>完整支持 MySQL 和 PostgreSQL 方言，一套工具覆盖主流数据库</p>
-        </div>
-        <div class="feature-card">
-          <h3>自动检测</h3>
-          <p>无需手动指定方言，基于加权评分系统自动识别 SQL 方言类型</p>
-        </div>
-        <div class="feature-card">
-          <h3>关键字大写</h3>
-          <p>一键将所有 SQL 关键字转为大写，提升代码可读性</p>
-        </div>
-        <div class="feature-card">
-          <h3>可配置缩进</h3>
-          <p>自定义缩进空格数，适配你的编码风格</p>
-        </div>
-        <div class="feature-card">
-          <h3>Dry-run 模式</h3>
-          <p>预览格式化结果而不改写文件，放心试用</p>
-        </div>
-        <div class="feature-card">
-          <h3>配置文件</h3>
-          <p>通过 <code style="font-size:0.85rem">.dbsqlfmtrc</code> 持久化选项，团队共享配置</p>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <h2>安装</h2>
-      <p style="color: var(--muted); margin-bottom: 8px;">全局安装，命令行直接使用：</p>
-      <div class="code-block">
-        <span class="keyword">npm</span> i -g @badai147/dbsqlfmt
-      </div>
-      <p style="color: var(--muted); margin-top: 16px;">或本地项目安装：</p>
-      <div class="code-block">
-        <span class="keyword">npm</span> i -D @badai147/dbsqlfmt
-      </div>
-    </section>
-
-    <section>
-      <h2>使用</h2>
-      <div class="usage-grid">
-        <div class="usage-item">
-          <div class="label">基础格式化</div>
-          <div class="code-block" style="margin-top:8px;">
-            dbsqlfmt format query.sql
-          </div>
-        </div>
-        <div class="usage-item">
-          <div class="label">指定方言 + 关键字大写</div>
-          <div class="code-block" style="margin-top:8px;">
-            dbsqlfmt format query.sql --language postgresql --uppercase
-          </div>
-        </div>
-        <div class="usage-item">
-          <div class="label">预览模式（不写回文件）</div>
-          <div class="code-block" style="margin-top:8px;">
-            dbsqlfmt format query.sql --dry-run
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <h2>选项</h2>
-      <div class="code-block">
-        <span class="comment"># 所有可用选项</span><br>
-        -l, --language &lt;lang&gt;   SQL 方言 (mysql / postgresql)<br>
-        -i, --indent &lt;size&gt;      缩进空格数 (默认 2)<br>
-        -u, --uppercase            关键字转大写<br>
-        --dry-run                  仅预览，不改写文件<br>
-        -V, --version              查看版本号<br>
-        -h, --help                 查看帮助
-      </div>
-    </section>
-  </div>
-
-  <footer>
-    <div class="container">
-      <p>MIT License &middot; <a href="https://github.com/badai147/dbsqlfmt" target="_blank">badai147/dbsqlfmt</a></p>
+    <a href="#" class="nav-logo">dbsql<span>fmt</span></a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#usage">Usage</a>
+      <a href="#options">Options</a>
+      <a href="https://github.com/badai147/dbsqlfmt" target="_blank" class="btn-small">GitHub</a>
     </div>
-  </footer>
+  </div>
+</nav>
+
+<!-- ── hero ── -->
+<section class="hero" id="hero">
+  <div class="hero-watermark" aria-hidden="true">SELECT *</div>
+  <div class="container">
+    <div class="hero-badge">✦ v0.1.3</div>
+    <h1>dbsql<span class="accent">fmt</span></h1>
+    <p class="sub">SQL 格式化 CLI 工具，自动识别方言，开箱即用</p>
+    <div class="tags">
+      <span>MySQL</span><span>PostgreSQL</span><span>自动检测</span><span>CLI</span>
+    </div>
+    <div class="hero-badges">
+      <img src="https://img.shields.io/badge/version-0.1.3-181a22?style=flat&labelColor=232631&color=d4a853" alt="version">
+      <img src="https://img.shields.io/badge/node-%3E%3D18-181a22?style=flat&labelColor=232631&color=2dd4bf" alt="node">
+      <img src="https://img.shields.io/badge/license-MIT-181a22?style=flat&labelColor=232631&color=d4a853" alt="license">
+    </div>
+    <div class="hero-actions">
+      <a href="https://github.com/badai147/dbsqlfmt" target="_blank" class="btn btn-primary">GitHub</a>
+      <a href="https://www.npmjs.com/package/@badai147/dbsqlfmt" target="_blank" class="btn btn-secondary">npm</a>
+    </div>
+
+    <div class="terminal-widget">
+      <div class="term-header">
+        <span class="term-dot r"></span>
+        <span class="term-dot y"></span>
+        <span class="term-dot g"></span>
+        <span class="term-title">dbsqlfmt — query.sql</span>
+      </div>
+      <div class="term-body">
+<pre><span class="cm"># Before</span>
+<span class="kw">SELECT</span> id, name, <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> cnt <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> age <span class="op">></span> <span class="str">18</span> <span class="kw">GROUP BY</span> id, name <span class="kw">HAVING</span> cnt <span class="op">></span> <span class="str">5</span>;
+
+<span class="cm"># dbsqlfmt —after —&gt;</span>
+
+<span class="kw">SELECT</span>
+  id,
+  name,
+  <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> cnt
+<span class="kw">FROM</span>
+  users
+<span class="kw">WHERE</span>
+  age <span class="op">></span> <span class="str">18</span>
+<span class="kw">GROUP BY</span>
+  id,
+  name
+<span class="kw">HAVING</span>
+  cnt <span class="op">></span> <span class="str">5</span><span class="term-cursor"></span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── features ── -->
+<section id="features">
+  <div class="container">
+    <p class="section-label reveal">✦ Features</p>
+    <h2 class="section-title reveal reveal-d1">Built for SQL<br>craftsmanship</h2>
+    <p class="section-desc reveal reveal-d2">从自动方言检测到关键字大写，每个细节都为更好的 SQL 体验设计。</p>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-d1"><div class="feature-icon">♢</div><p class="feature-tag">Dialect</p><h3>双方言支持</h3><p>完整支持 MySQL 和 PostgreSQL 方言语法，一套工具覆盖主流数据库。</p></div>
+      <div class="feature-card reveal reveal-d2"><div class="feature-icon">⚡</div><p class="feature-tag">Auto-detect</p><h3>自动方言检测</h3><p>基于加权评分系统自动识别 SQL 方言类型，无需手动指定 —lang。</p></div>
+      <div class="feature-card reveal reveal-d3"><div class="feature-icon">⇧</div><p class="feature-tag">Format</p><h3>关键字大写</h3><p>一键将 SQL 关键字转为大写，提升代码可读性与团队一致性。</p></div>
+      <div class="feature-card reveal reveal-d2"><div class="feature-icon">◇</div><p class="feature-tag">Style</p><h3>可配置缩进</h3><p>自定义缩进空格数，2 / 4 / 8 任选，无缝适配你的编码风格。</p></div>
+      <div class="feature-card reveal reveal-d3"><div class="feature-icon">◉</div><p class="feature-tag">Safety</p><h3>Dry-run 模式</h3><p>仅预览格式化结果，不改写源文件。放心试用，零风险。</p></div>
+      <div class="feature-card reveal reveal-d4"><div class="feature-icon">⚙</div><p class="feature-tag">Config</p><h3>配置文件</h3><p>通过 <code style="font-size:.82rem;font-family:'JetBrains Mono',monospace;color:var(--accent)">.dbsqlfmtrc</code> 持久化选项，团队共享同一套配置。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── install ── -->
+<section id="install">
+  <div class="container">
+    <p class="section-label reveal">✦ Install</p>
+    <h2 class="section-title reveal reveal-d1">Get started in<br>one command</h2>
+    <p class="section-desc reveal reveal-d2">全局安装或本地开发依赖，随你选择。</p>
+    <div class="install-block reveal reveal-d2">
+      <div class="install-header"><span class="prompt">$</span> Install dbsqlfmt globally</div>
+      <div class="install-body">
+        <div class="line"><span class="prompt">$</span><span class="cmd"> npm i -g @badai147/dbsqlfmt</span><span class="install-cursor"></span></div>
+        <div class="line" style="margin-top:2px"><span class="prompt"></span><span class="output">added 1 package in 2s</span></div>
+        <div style="margin-top:8px;border-top:1px solid rgba(35,38,49,0.4);padding-top:8px">
+          <div class="line"><span class="prompt">$</span><span class="cmd"> dbsqlfmt --version</span></div>
+          <div class="line"><span class="prompt"></span><span class="output">0.1.3</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── usage ── -->
+<section id="usage">
+  <div class="container">
+    <p class="section-label reveal">✦ Usage</p>
+    <h2 class="section-title reveal reveal-d1">Simple by design</h2>
+    <p class="section-desc reveal reveal-d2">三个常用场景，一看就会。</p>
+    <div class="usage-grid">
+      <div class="usage-item reveal reveal-d1">
+        <p class="usage-label">基础格式化</p>
+        <div class="usage-code">dbsqlfmt format query.sql</div>
+        <p class="usage-desc">自动检测方言，输出格式化后的 SQL。不指定文件后缀限制。</p>
+      </div>
+      <div class="usage-item reveal reveal-d2">
+        <p class="usage-label">方言 + 大写</p>
+        <div class="usage-code">dbsqlfmt format query.sql --language postgresql --uppercase</div>
+        <p class="usage-desc">显式指定 PG 方言，同时将所有关键字转为大写。</p>
+      </div>
+      <div class="usage-item reveal reveal-d3">
+        <p class="usage-label">预览模式</p>
+        <div class="usage-code">dbsqlfmt format query.sql --dry-run</div>
+        <p class="usage-desc">仅输出到终端不改写文件。配合 DBeaver 外部工具极佳。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── options ── -->
+<section id="options">
+  <div class="container">
+    <p class="section-label reveal">✦ Options</p>
+    <h2 class="section-title reveal reveal-d1">Every flag<br>documented</h2>
+    <p class="section-desc reveal reveal-d2">CLI 选项覆盖配置文件中的同名设置。</p>
+    <div class="reveal reveal-d2" style="overflow-x:auto;border-radius:10px;border:1px solid var(--border)">
+      <table class="options-table">
+        <thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
+        <tbody>
+          <tr><td>-l, --language &lt;lang&gt;</td><td>SQL 方言（mysql / postgresql）</td><td>自动检测</td></tr>
+          <tr><td>-i, --indent &lt;size&gt;</td><td>缩进空格数</td><td>2</td></tr>
+          <tr><td>-u, --uppercase</td><td>关键字转为大写</td><td>—</td></tr>
+          <tr><td>--dry-run</td><td>仅输出到终端，不改写文件</td><td>—</td></tr>
+          <tr><td>-V, --version</td><td>查看版本号</td><td>—</td></tr>
+          <tr><td>-h, --help</td><td>查看帮助信息</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>MIT License · <a href="https://github.com/badai147/dbsqlfmt" target="_blank">badai147/dbsqlfmt</a></p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const els = document.querySelectorAll('.reveal');
+  if (!els.length) return;
+  const obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(function(el) { obs.observe(el); });
+})();
+</script>
 </body>
 </html>
