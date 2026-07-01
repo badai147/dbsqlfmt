@@ -29,7 +29,7 @@ describe('formatFile', () => {
     formatFile(fp, { language: 'mysql', uppercase: true });
     const content = fs.readFileSync(fp, 'utf-8');
     expect(content).toContain('SELECT');
-    expect(content).toContain('id');
+    expect(content).toContain('ID');
   });
 
   it('dryRun 模式不修改文件', async () => {
@@ -52,7 +52,7 @@ describe('formatFile', () => {
     fs.writeFileSync(fp, 'select id::text from users', 'utf-8');
     formatFile(fp, {});
     const content = fs.readFileSync(fp, 'utf-8');
-    expect(content).toContain('id');
+    expect(content).toContain('ID');
   });
 
   it('uppercase 选项生效', async () => {

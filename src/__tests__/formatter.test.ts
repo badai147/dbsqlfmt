@@ -22,18 +22,56 @@ describe('formatSql', () => {
 
   it('不传 language 时自动检测 PostgreSQL（:: 触发）', () => {
     const result = formatSql('select id::text from users');
-    expect(result).toContain('id');
+    expect(result).toContain('ID');
   });
 
-  it('uppercase 选项将关键字转为大写', () => {
-    const result = formatSql('select id from users', { uppercase: true });
+  it('默认关键字大写', () => {
+    const result = formatSql('select id from users');
     expect(result).toContain('SELECT');
     expect(result).not.toContain('select');
   });
 
-  it('uppercase 关闭时保留原大小写', () => {
-    const result = formatSql('select id from users', { uppercase: false });
+  it('keywordCase: lower 转小写', () => {
+    const result = formatSql('SELECT ID FROM USERS', { keywordCase: 'lower' });
     expect(result).toContain('select');
+    expect(result).not.toContain('SELECT');
+  });
+
+  it('keywordCase: preserve 保留原样', () => {
+    const result = formatSql('select id from users', { keywordCase: 'preserve' });
+    expect(result).toContain('select');
+  });
+
+  it('keywordCase: upper 转大写', () => {
+    const result = formatSql('select id from users', { keywordCase: 'upper' });
+    expect(result).toContain('SELECT');
+    expect(result).not.toContain('select');
+  });
+
+  it('uppercase 向后兼容', () => {
+    const result = formatSql('select id from users', { uppercase: true });
+    expect(result).toContain('SELECT');
+  });
+
+  it('keywordCase 优先于 uppercase', () => {
+    const result = formatSql('SELECT ID FROM USERS', { uppercase: true, keywordCase: 'lower' });
+    expect(result).toContain('select');
+  });
+
+  it('dataTypeCase: lower 转小写数据类型', () => {
+    const result = formatSql('SELECT CAST(id AS INT)', { dataTypeCase: 'lower' });
+    expect(result).toContain('int');
+  });
+
+  it('functionCase: lower 转小写函数名', () => {
+    const result = formatSql('SELECT COUNT(*) FROM users', { functionCase: 'lower' });
+    expect(result).toContain('count(*)');
+  });
+
+  it('identifierCase: upper 转大写标识符', () => {
+    const result = formatSql('select id from users', { identifierCase: 'upper', keywordCase: 'preserve' });
+    expect(result).toContain('ID');
+    expect(result).toContain('USERS');
   });
 
   it('indent 选项控制缩进', () => {

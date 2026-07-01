@@ -1,11 +1,11 @@
 # dbsqlfmt
 
-![Version](https://img.shields.io/badge/version-0.1.3-blue)
+![Version](https://img.shields.io/badge/version-0.1.4-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.x-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-**dbsqlfmt** 是一个基于 [sql-formatter](https://github.com/sql-formatter-org/sql-formatter) 的 SQL 格式化 CLI 工具，支持 MySQL、PostgreSQL 两种方言，**自动识别方言**，支持配置文件、关键字大写等特性。
+**dbsqlfmt** 是一个基于 [sql-formatter](https://github.com/sql-formatter-org/sql-formatter) 的 SQL 格式化 CLI 工具，支持 MySQL、PostgreSQL 两种方言，**自动识别方言**，支持配置文件、关键字/数据类型/函数名/标识符大小写控制等特性。
 
 ## 目录
 
@@ -24,7 +24,7 @@
 - 支持 MySQL 和 PostgreSQL 两种方言
 - **自动识别 SQL 方言**，无需手动指定
 - 可自定义缩进大小
-- 关键字大写选项
+- **全面的关键字/数据类型/函数名/标识符大小写控制**（大写、小写、保持原样）
 - Dry-run 预览模式，不改写文件
 - 通过 `.dbsqlfmtrc` 配置文件持久化选项
 
@@ -54,10 +54,16 @@ dbsqlfmt format <file> [options]
 dbsqlfmt format query.sql
 ```
 
-**指定方言 + 关键字大写：**
+**指定方言：**
 
 ```bash
-dbsqlfmt format query.sql --language postgresql --uppercase
+dbsqlfmt format query.sql --language postgresql
+```
+
+**关键字小写 + 数据类型保持原样：**
+
+```bash
+dbsqlfmt format query.sql --keyword-case lower --data-type-case preserve
 ```
 
 **仅预览结果，不写回文件：**
@@ -74,14 +80,18 @@ dbsqlfmt format "${file}" --dry-run
 
 ## 选项
 
-| 选项                    | 描述                               | 默认值  |
-| ----------------------- | ---------------------------------- | ------- |
+| 选项 | 描述 | 默认值 |
+|------|------|--------|
 | `-l, --language <lang>` | SQL 方言（`mysql` / `postgresql`，不指定则自动识别） | 自动检测 |
-| `-i, --indent <size>`   | 缩进空格数                         | `2`     |
-| `-u, --uppercase`       | 将关键字转为大写                   | 关闭    |
-| `--dry-run`             | 仅输出到终端，不改写文件           | 关闭    |
-| `-V, --version`         | 查看版本号                         |         |
-| `-h, --help`            | 查看帮助信息                       |         |
+| `-i, --indent <size>` | 缩进空格数 | `2` |
+| `-u, --uppercase` | `--keyword-case upper` 的快捷方式 | 关闭 |
+| `--keyword-case <style>` | 关键字大小写：`upper` / `lower` / `preserve` | `upper` |
+| `--data-type-case <style>` | 数据类型大小写：`upper` / `lower` / `preserve` | `upper` |
+| `--function-case <style>` | 函数名大小写：`upper` / `lower` / `preserve` | `upper` |
+| `--identifier-case <style>` | 标识符大小写：`upper` / `lower` / `preserve`（实验性） | `upper` |
+| `--dry-run` | 仅输出到终端，不改写文件 | 关闭 |
+| `-V, --version` | 查看版本号 | |
+| `-h, --help` | 查看帮助信息 | |
 
 ## 配置文件
 
@@ -91,7 +101,8 @@ dbsqlfmt format "${file}" --dry-run
 {
   "language": "mysql",
   "indent": "4",
-  "uppercase": true
+  "keywordCase": "upper",
+  "functionCase": "lower"
 }
 ```
 
@@ -146,8 +157,11 @@ dbsqlfmt/
 ├── src/
 │   ├── __tests__/
 │   │   ├── README.md       # 测试说明
-│   │   ├── detect.test.ts  # 方言检测单元测试（60 用例）
-│   │   └── formatter.test.ts # 格式化集成测试（9 用例）
+│   │   ├── config.test.ts    # 配置加载测试（8 用例）
+│   │   ├── detect.test.ts    # 方言检测单元测试（60 用例）
+│   │   ├── formatter.test.ts # 格式化集成测试（16 用例）
+│   │   ├── index.test.ts     # 主流程测试（5 用例）
+│   │   └── utils.test.ts     # 工具函数测试（6 用例）
 │   ├── cli.ts        # Commander 参数解析与命令注册
 │   ├── index.ts      # 主流程编排
 │   ├── formatter.ts  # sql-formatter 封装

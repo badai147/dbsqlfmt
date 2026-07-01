@@ -58,6 +58,28 @@ describe('mergeConfig', () => {
     expect((result as Record<string, unknown>).secret).toBeUndefined();
   });
 
+  it('配置文件中新 case 选项生效', async () => {
+    const { mergeConfig } = await import('../config');
+    fs.writeFileSync(
+      path.join(tmpDir, '.dbsqlfmtrc'),
+      JSON.stringify({ keywordCase: 'lower', dataTypeCase: 'preserve', functionCase: 'upper', identifierCase: 'lower' }),
+      'utf-8'
+    );
+    const result = mergeConfig({});
+    expect(result).toEqual({ keywordCase: 'lower', dataTypeCase: 'preserve', functionCase: 'upper', identifierCase: 'lower' });
+  });
+
+  it('CLI case 选项覆盖配置文件', async () => {
+    const { mergeConfig } = await import('../config');
+    fs.writeFileSync(
+      path.join(tmpDir, '.dbsqlfmtrc'),
+      JSON.stringify({ keywordCase: 'upper', functionCase: 'upper' }),
+      'utf-8'
+    );
+    const result = mergeConfig({ keywordCase: 'lower' });
+    expect(result).toEqual({ keywordCase: 'lower', functionCase: 'upper' });
+  });
+
   it('配置文件 JSON 无效时返回 {}', async () => {
     const { mergeConfig } = await import('../config');
     fs.writeFileSync(

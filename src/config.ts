@@ -1,15 +1,21 @@
 import fs from 'fs';
 import path from 'path';
+import { type CaseOption } from './formatter';
 
 export interface Config {
   language?: string;
   indent?: string;
   uppercase?: boolean;
   dryRun?: boolean;
+  keywordCase?: CaseOption;
+  dataTypeCase?: CaseOption;
+  functionCase?: CaseOption;
+  identifierCase?: CaseOption;
 }
 
 const ALLOWED_KEYS: readonly (keyof Config)[] = [
   'language', 'indent', 'uppercase', 'dryRun',
+  'keywordCase', 'dataTypeCase', 'functionCase', 'identifierCase',
 ];
 const MAX_CONFIG_SIZE = 1024 * 1024;
 
