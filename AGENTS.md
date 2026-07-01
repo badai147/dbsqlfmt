@@ -43,3 +43,27 @@ cli.ts (Commander) → index.ts:formatFile → formatter.ts:formatSql
 1. 编写或更新测试（`src/__tests__/`）
 2. `npm test` 验证全部通过
 3. 更新相关文档（`AGENTS.md`、`README.md`、`package.json` 等）
+
+## Release 内容模板
+
+当需要写 GitHub Release 内容时，按以下格式输出：
+
+```markdown
+## v<版本号> — <一句话标题>
+
+### <emoji> <分类名>
+- **<加粗项>**：<说明>
+- <普通项>
+
+### 📦 安装
+
+```bash
+npm install -g @badai147/dbsqlfmt
+```
+```
+
+### 格式规则
+1. 标题行：`## vX.Y.Z — <描述>`，全角破折号 `—`
+2. 分类用 `### <emoji> <标题>`，emoji + 空格 + 中文
+3. 突出功能用 **加粗** + 全角冒号 `：`，普通条目直接写
+4. 末尾固定以 `### 📦 安装` + 代码块收尾

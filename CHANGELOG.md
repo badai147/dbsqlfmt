@@ -1,23 +1,29 @@
 # 更新日志
 
-## v0.1.4 (2026-07-01)
+## v0.1.4 — 大小写精细化控制 & 默认全部大写
 
-### 大小写精细化控制
-
-- **4 个独立大小写选项**：新增 `--keyword-case`、`--data-type-case`、`--function-case`、`--identifier-case`，均支持 `upper` / `lower` / `preserve` 三种值
+### 🔤 大小写控制
+- **4 个独立大小写选项**：新增 `--keyword-case` / `--data-type-case` / `--function-case` / `--identifier-case`，均支持 `upper` / `lower` / `preserve` 三种值
 - **默认全部大写**：所有 case 选项默认值改为 `upper`（原默认 `preserve`）
 - **向后兼容**：保留 `-u` / `--uppercase` 快捷开关，`--keyword-case` 等显式选项优先级更高
 
-### 配置系统扩展
+### ⚙️ 配置系统扩展
+- `.dbsqlfmtrc` 新增 `keywordCase` / `dataTypeCase` / `functionCase` / `identifierCase` 四个配置键
+- 白名单 `ALLOWED_KEYS` 同步更新
 
-- `.dbsqlfmtrc` 配置文件新增 `keywordCase`、`dataTypeCase`、`functionCase`、`identifierCase` 四个键
-- `ALLOWED_KEYS` 白名单同步更新
+### 🧪 测试覆盖
+- 新增大小写选项测试用例（优先级、独立控制、配置文件新键等）
+- 全量测试从 86 条 → **95 条**
 
-### 文档与测试
+### 🛠 工程改进
+- 新增 `vitest.config.ts` 排除 `dist/` 目录避免编译产物干扰测试
+- 网站页面版本号与选项表格同步更新
 
-- 全量测试从 86 条增至 95 条
-- 新增大小写选项相关测试用例（keywordCase 优先级、各 case 选项独立控制、配置文件新键等）
-- 更新 README 选项表格、使用示例、配置文件示例
+### 📦 安装
+
+```bash
+npm install -g @badai147/dbsqlfmt
+```
 
 ---
 
