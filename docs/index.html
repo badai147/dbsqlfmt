@@ -407,14 +407,14 @@
 <section class="hero" id="hero">
   <div class="hero-watermark" aria-hidden="true">SELECT *</div>
   <div class="container">
-    <div class="hero-badge">✦ v0.1.3</div>
+    <div class="hero-badge">✦ v0.1.4</div>
     <h1>dbsql<span class="accent">fmt</span></h1>
     <p class="sub">SQL 格式化 CLI 工具，自动识别方言，开箱即用</p>
     <div class="tags">
       <span>MySQL</span><span>PostgreSQL</span><span>自动检测</span><span>CLI</span>
     </div>
     <div class="hero-badges">
-      <img src="https://img.shields.io/badge/version-0.1.3-181a22?style=flat&labelColor=232631&color=d4a853" alt="version">
+      <img src="https://img.shields.io/badge/version-0.1.4-181a22?style=flat&labelColor=232631&color=d4a853" alt="version">
       <img src="https://img.shields.io/badge/node-%3E%3D18-181a22?style=flat&labelColor=232631&color=2dd4bf" alt="node">
       <img src="https://img.shields.io/badge/license-MIT-181a22?style=flat&labelColor=232631&color=d4a853" alt="license">
     </div>
@@ -460,11 +460,11 @@
   <div class="container">
     <p class="section-label reveal">✦ Features</p>
     <h2 class="section-title reveal reveal-d1">Built for SQL<br>craftsmanship</h2>
-    <p class="section-desc reveal reveal-d2">从自动方言检测到关键字大写，每个细节都为更好的 SQL 体验设计。</p>
+    <p class="section-desc reveal reveal-d2">从自动方言检测到大小写精细控制，每个细节都为更好的 SQL 体验设计。</p>
     <div class="features-grid">
       <div class="feature-card reveal reveal-d1"><div class="feature-icon">♢</div><p class="feature-tag">Dialect</p><h3>双方言支持</h3><p>完整支持 MySQL 和 PostgreSQL 方言语法，一套工具覆盖主流数据库。</p></div>
       <div class="feature-card reveal reveal-d2"><div class="feature-icon">⚡</div><p class="feature-tag">Auto-detect</p><h3>自动方言检测</h3><p>基于加权评分系统自动识别 SQL 方言类型，无需手动指定 —lang。</p></div>
-      <div class="feature-card reveal reveal-d3"><div class="feature-icon">⇧</div><p class="feature-tag">Format</p><h3>关键字大写</h3><p>一键将 SQL 关键字转为大写，提升代码可读性与团队一致性。</p></div>
+      <div class="feature-card reveal reveal-d3"><div class="feature-icon">⇧</div><p class="feature-tag">Format</p><h3>大小写控制</h3><p>关键字、数据类型、函数名、标识符大小写独立控制，默认全部大写。</p></div>
       <div class="feature-card reveal reveal-d2"><div class="feature-icon">◇</div><p class="feature-tag">Style</p><h3>可配置缩进</h3><p>自定义缩进空格数，2 / 4 / 8 任选，无缝适配你的编码风格。</p></div>
       <div class="feature-card reveal reveal-d3"><div class="feature-icon">◉</div><p class="feature-tag">Safety</p><h3>Dry-run 模式</h3><p>仅预览格式化结果，不改写源文件。放心试用，零风险。</p></div>
       <div class="feature-card reveal reveal-d4"><div class="feature-icon">⚙</div><p class="feature-tag">Config</p><h3>配置文件</h3><p>通过 <code style="font-size:.82rem;font-family:'JetBrains Mono',monospace;color:var(--accent)">.dbsqlfmtrc</code> 持久化选项，团队共享同一套配置。</p></div>
@@ -485,7 +485,7 @@
         <div class="line" style="margin-top:2px"><span class="prompt"></span><span class="output">added 1 package in 2s</span></div>
         <div style="margin-top:8px;border-top:1px solid rgba(35,38,49,0.4);padding-top:8px">
           <div class="line"><span class="prompt">$</span><span class="cmd"> dbsqlfmt --version</span></div>
-          <div class="line"><span class="prompt"></span><span class="output">0.1.3</span></div>
+          <div class="line"><span class="prompt"></span><span class="output">0.1.4</span></div>
         </div>
       </div>
     </div>
@@ -505,9 +505,9 @@
         <p class="usage-desc">自动检测方言，输出格式化后的 SQL。不指定文件后缀限制。</p>
       </div>
       <div class="usage-item reveal reveal-d2">
-        <p class="usage-label">方言 + 大写</p>
-        <div class="usage-code">dbsqlfmt format query.sql --language postgresql --uppercase</div>
-        <p class="usage-desc">显式指定 PG 方言，同时将所有关键字转为大写。</p>
+        <p class="usage-label">关键字小写</p>
+        <div class="usage-code">dbsqlfmt format query.sql --keyword-case lower</div>
+        <p class="usage-desc">将关键字转为小写，数据类型和函数名保持默认大写。</p>
       </div>
       <div class="usage-item reveal reveal-d3">
         <p class="usage-label">预览模式</p>
@@ -530,7 +530,11 @@
         <tbody>
           <tr><td>-l, --language &lt;lang&gt;</td><td>SQL 方言（mysql / postgresql）</td><td>自动检测</td></tr>
           <tr><td>-i, --indent &lt;size&gt;</td><td>缩进空格数</td><td>2</td></tr>
-          <tr><td>-u, --uppercase</td><td>关键字转为大写</td><td>—</td></tr>
+          <tr><td>-u, --uppercase</td><td>--keyword-case upper 快捷方式</td><td>—</td></tr>
+          <tr><td>--keyword-case &lt;style&gt;</td><td>关键字大小写：upper / lower / preserve</td><td>upper</td></tr>
+          <tr><td>--data-type-case &lt;style&gt;</td><td>数据类型大小写：upper / lower / preserve</td><td>upper</td></tr>
+          <tr><td>--function-case &lt;style&gt;</td><td>函数名大小写：upper / lower / preserve</td><td>upper</td></tr>
+          <tr><td>--identifier-case &lt;style&gt;</td><td>标识符大小写：upper / lower / preserve（实验性）</td><td>upper</td></tr>
           <tr><td>--dry-run</td><td>仅输出到终端，不改写文件</td><td>—</td></tr>
           <tr><td>-V, --version</td><td>查看版本号</td><td>—</td></tr>
           <tr><td>-h, --help</td><td>查看帮助信息</td><td>—</td></tr>
