@@ -3,44 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>dbsqlfmt — SQL Formatter</title>
+  <title>dbsqlfmt — SQL 格式化工具</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
       font-family:'DM Sans',sans-serif;
-      background:#08090e;
-      color:#eeedea;
+      background:#f7f8fa;
+      color:#111827;
       line-height:1.6;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale
+      -webkit-font-smoothing:antialiased
     }
     :root{
-      --bg:#08090e;
-      --surface:#101117;
-      --surface-2:#181a22;
-      --border:#232631;
-      --text:#eeedea;
-      --text-muted:#83848e;
-      --accent:#d4a853;
-      --accent-dim:#8b6d35;
-      --accent-glow:rgba(212,168,83,0.1);
-      --accent-teal:#2dd4bf;
-      --code-bg:#0c0d13;
-      --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E")
+      --bg:#f7f8fa;
+      --surface:#fff;
+      --border:#e5e7eb;
+      --text:#111827;
+      --text-secondary:#6b7280;
+      --text-muted:#9ca3af;
+      --accent:#2563eb;
+      --accent-hover:#1d4ed8;
+      --accent-light:#eff6ff;
+      --code-bg:#0f172a
     }
     .container{max-width:1040px;margin:0 auto;padding:0 24px}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
 
     /* ── nav ── */
     nav{
       position:fixed;top:0;left:0;right:0;z-index:100;
-      backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
-      background:rgba(8,9,14,0.7);
-      border-bottom:1px solid rgba(35,38,49,0.5)
+      background:rgba(255,255,255,0.85);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border)
     }
     nav .container{
       display:flex;align-items:center;justify-content:space-between;
@@ -55,138 +53,124 @@
     .nav-logo span{color:var(--accent)}
     .nav-links{display:flex;gap:24px;align-items:center}
     .nav-links a{
-      font-size:0.85rem;font-weight:500;color:var(--text-muted);
+      font-size:.85rem;font-weight:500;color:var(--text-secondary);
       text-decoration:none;transition:color .2s
     }
     .nav-links a:hover{color:var(--text)}
-    .nav-links .btn-small{
-      font-size:0.8rem;font-weight:600;
+    .nav-links .nav-cta{
+      font-size:.8rem;font-weight:600;
       padding:6px 16px;border-radius:6px;
-      background:var(--accent);color:#08090e;
+      background:var(--accent);color:#fff;
       text-decoration:none;transition:opacity .2s
     }
-    .nav-links .btn-small:hover{opacity:.85}
+    .nav-links .nav-cta:hover{opacity:.9;color:#fff}
+
+    /* ── hamburger ── */
+    .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+    .hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:transform .25s,opacity .25s}
+    .hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+    .hamburger.active span:nth-child(2){opacity:0}
+    .hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
 
     /* ── hero ── */
     .hero{
       position:relative;overflow:hidden;
-      padding:140px 0 80px;
-      background:
-        radial-gradient(ellipse 70% 55% at 50% -10%, rgba(212,168,83,0.06), transparent),
-        var(--bg)
+      padding:140px 0 80px
     }
-    .hero::before{
-      content:'';position:absolute;inset:0;
-      background-image:
-        linear-gradient(rgba(35,38,49,0.3) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(35,38,49,0.3) 1px, transparent 1px);
-      background-size:56px 56px;
-      pointer-events:none;
-      -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 70%);
-      mask-image:radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 70%)
-    }
-    .hero::after{
-      content:'';position:absolute;inset:0;
-      background:var(--grain);
+    .hero-bg{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg,#eff6ff 0%,#f7f8fa 100%);
       pointer-events:none
     }
-    .hero-watermark{
-      position:absolute;font-family:'Bricolage Grotesque',sans-serif;
-      font-weight:800;font-size:min(28vw,360px);line-height:1;
-      color:rgba(212,168,83,0.025);
-      top:50%;left:50%;transform:translate(-50%,-50%);
-      pointer-events:none;user-select:none;
-      white-space:nowrap;text-align:center;
-      letter-spacing:-0.04em
+    .hero-bg::before{
+      content:'';position:absolute;inset:0;
+      background-image:radial-gradient(circle at 24px 24px,var(--border) 1px,transparent 0);
+      background-size:48px 48px;opacity:.5
     }
     .hero .container{position:relative;z-index:1;text-align:center}
     .hero-badge{
       display:inline-flex;align-items:center;gap:6px;
       padding:4px 14px;border-radius:100px;
-      font-size:.75rem;font-weight:600;letter-spacing:.03em;
-      text-transform:uppercase;
-      background:rgba(212,168,83,0.08);
-      border:1px solid rgba(212,168,83,0.15);
+      font-size:.75rem;font-weight:600;letter-spacing:.02em;
+      background:var(--accent-light);
+      border:1px solid #bfdbfe;
       color:var(--accent);margin-bottom:20px
     }
     .hero h1{
       font-family:'Bricolage Grotesque',sans-serif;
-      font-weight:800;font-size:clamp(2.8rem,7vw,5.2rem);
+      font-weight:800;font-size:clamp(2.8rem,6vw,4.8rem);
       letter-spacing:-0.03em;line-height:1.05;
       margin-bottom:16px
     }
     .hero h1 .accent{color:var(--accent)}
     .hero .sub{
-      font-size:clamp(1.05rem,2vw,1.25rem);
-      color:var(--text-muted);max-width:520px;margin:0 auto 16px
+      font-size:clamp(1.05rem,1.8vw,1.2rem);
+      color:var(--text-secondary);max-width:520px;margin:0 auto 16px
     }
     .hero .tags{
       display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
-      margin-bottom:28px
+      margin-bottom:24px
     }
     .hero .tags span{
-      font-size:.75rem;font-weight:500;color:var(--text-muted);
+      font-size:.75rem;font-weight:500;color:var(--text-secondary);
       padding:2px 12px;border-radius:4px;
-      background:rgba(35,38,49,0.4)
+      background:var(--surface);border:1px solid var(--border)
     }
-    .hero-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+    .hero-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:32px}
     .hero-badges img{height:20px;border-radius:3px}
-    .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
+    .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
     .btn{
       display:inline-flex;align-items:center;gap:8px;
       padding:11px 28px;border-radius:8px;
       font-size:.9rem;font-weight:600;text-decoration:none;
-      transition:all .25s;cursor:pointer;border:none
+      transition:all .2s;cursor:pointer;border:none
     }
     .btn-primary{
-      background:var(--accent);color:#08090e
+      background:var(--accent);color:#fff
     }
     .btn-primary:hover{
-      background:#e0b85e;transform:translateY(-1px);
-      box-shadow:0 8px 24px rgba(212,168,83,0.25)
+      background:var(--accent-hover);
+      box-shadow:0 4px 12px rgba(37,99,235,.3)
     }
     .btn-secondary{
       background:var(--surface);color:var(--text);
       border:1px solid var(--border)
     }
     .btn-secondary:hover{
-      background:var(--surface-2);transform:translateY(-1px);
-      border-color:var(--text-muted)
+      border-color:#9ca3af;background:#f9fafb
     }
 
-    /* ── terminal widget ── */
-    .terminal-widget{
+    /* ── code block ── */
+    .code-block{
       max-width:680px;margin:0 auto;
       background:var(--code-bg);
-      border:1px solid var(--border);
       border-radius:10px;overflow:hidden;
       text-align:left;
-      box-shadow:0 12px 48px rgba(0,0,0,0.3)
+      box-shadow:0 8px 32px rgba(0,0,0,.12)
     }
-    .term-header{
+    .code-header{
       display:flex;align-items:center;gap:8px;
-      padding:10px 14px;
-      background:rgba(24,26,34,0.8);
-      border-bottom:1px solid var(--border)
+      padding:10px 16px;
+      background:rgba(255,255,255,.04);
+      border-bottom:1px solid rgba(255,255,255,.06)
     }
-    .term-dot{width:9px;height:9px;border-radius:50%}
-    .term-dot.r{background:#ff5f57}
-    .term-dot.y{background:#febc2e}
-    .term-dot.g{background:#28c840}
-    .term-title{
-      font-size:.75rem;color:var(--text-muted);margin-left:auto
+    .code-dot{width:9px;height:9px;border-radius:50%}
+    .code-dot.r{background:#ff5f57}
+    .code-dot.y{background:#febc2e}
+    .code-dot.g{background:#28c840}
+    .code-title{
+      font-size:.75rem;color:rgba(255,255,255,.35);margin-left:auto
     }
-    .term-body{padding:16px 20px;overflow-x:auto}
-    .term-body pre{font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.65;color:#c9d1d9}
-    .term-body .kw{color:#ff7b72}
-    .term-body .fn{color:#79c0ff}
-    .term-body .str{color:#a5d6ff}
-    .term-body .op{color:#ffa657}
-    .term-body .cm{color:rgba(139,148,158,0.5)}
-    .term-body .accent{color:var(--accent)}
-    .term-cursor{
+    .code-body{padding:20px 24px;overflow-x:auto}
+    .code-body pre{font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;color:#e2e8f0}
+    .code-body .kw{color:#ff7b72}
+    .code-body .fn{color:#79c0ff}
+    .code-body .str{color:#a5d6ff}
+    .code-body .op{color:#ffa657}
+    .code-body .cm{color:rgba(148,163,184,.5)}
+    .code-cursor{
       display:inline-block;width:7px;height:1.1em;
-      background:var(--accent);vertical-align:text-bottom;
+      background:#60a5fa;vertical-align:text-bottom;
       animation:blink 1s step-end infinite;margin-left:4px
     }
     @keyframes blink{50%{opacity:0}}
@@ -194,17 +178,17 @@
     /* ── sections ── */
     section{padding:96px 0}
     .section-label{
-      font-size:.75rem;font-weight:700;letter-spacing:.06em;
+      font-size:.75rem;font-weight:700;letter-spacing:.05em;
       text-transform:uppercase;color:var(--accent);
       margin-bottom:12px
     }
     .section-title{
       font-family:'Bricolage Grotesque',sans-serif;
-      font-weight:700;font-size:clamp(1.6rem,3.5vw,2.4rem);
+      font-weight:700;font-size:clamp(1.6rem,3vw,2.2rem);
       letter-spacing:-0.02em;margin-bottom:8px
     }
     .section-desc{
-      font-size:1rem;color:var(--text-muted);
+      font-size:.95rem;color:var(--text-secondary);
       max-width:500px;margin-bottom:48px
     }
 
@@ -215,44 +199,35 @@
       gap:16px
     }
     .feature-card{
-      position:relative;
       background:var(--surface);
       border:1px solid var(--border);
-      border-radius:10px;padding:28px 24px;
-      transition:all .3s;overflow:hidden
-    }
-    .feature-card::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:3px;
-      background:linear-gradient(90deg,var(--accent),var(--accent-dim));
-      opacity:.6;transition:opacity .3s
+      border-radius:10px;padding:24px;
+      transition:border-color .2s,box-shadow .2s
     }
     .feature-card:hover{
-      border-color:rgba(212,168,83,0.2);
-      transform:translateY(-2px);
-      box-shadow:0 8px 32px rgba(0,0,0,0.2)
+      border-color:#d1d5db;
+      box-shadow:0 4px 16px rgba(0,0,0,.04)
     }
-    .feature-card:hover::before{opacity:1}
     .feature-icon{
       display:flex;align-items:center;justify-content:center;
       width:36px;height:36px;border-radius:8px;
-      background:rgba(212,168,83,0.08);
-      border:1px solid rgba(212,168,83,0.12);
+      background:var(--accent-light);
       color:var(--accent);font-size:1rem;
-      margin-bottom:16px
+      margin-bottom:14px
     }
     .feature-tag{
       display:inline-block;
       font-size:.65rem;font-weight:600;letter-spacing:.04em;
-      text-transform:uppercase;color:var(--accent-dim);
-      margin-bottom:8px
+      text-transform:uppercase;color:var(--text-muted);
+      margin-bottom:6px
     }
     .feature-card h3{
       font-family:'Bricolage Grotesque',sans-serif;
-      font-weight:700;font-size:1.05rem;
+      font-weight:700;font-size:1rem;
       margin-bottom:6px
     }
     .feature-card p{
-      font-size:.88rem;color:var(--text-muted);line-height:1.6
+      font-size:.85rem;color:var(--text-secondary);line-height:1.6
     }
 
     /* ── install ── */
@@ -264,22 +239,22 @@
     .install-header{
       display:flex;align-items:center;
       padding:8px 16px;
-      background:rgba(24,26,34,0.6);
+      background:#f9fafb;
       border-bottom:1px solid var(--border);
       font-family:'JetBrains Mono',monospace;
-      font-size:.72rem;color:var(--text-muted)
+      font-size:.72rem;color:var(--text-secondary)
     }
     .install-header .prompt{color:var(--accent);margin-right:8px}
     .install-body{
       padding:16px 20px;
       font-family:'JetBrains Mono',monospace;
-      font-size:.88rem;line-height:1.7
+      font-size:.85rem;line-height:1.7
     }
     .install-body .line{display:flex;align-items:center;gap:8px}
     .install-body .prompt{color:var(--accent)}
-    .install-body .cmd{color:#e6e1cf}
-    .install-body .comment{color:rgba(139,148,158,0.5);font-size:.78rem}
-    .install-body .output{color:var(--text-muted);font-size:.78rem;margin-left:calc(1ch + 8px)}
+    .install-body .cmd{color:var(--text)}
+    .install-body .comment{color:var(--text-muted);font-size:.75rem}
+    .install-body .output{color:var(--text-secondary);font-size:.75rem;margin-left:calc(1ch + 8px)}
     .install-cursor{
       display:inline-block;width:7px;height:1em;
       background:var(--accent);vertical-align:text-bottom;
@@ -296,95 +271,99 @@
       background:var(--surface);
       border:1px solid var(--border);
       border-radius:10px;padding:20px 24px;
-      transition:all .25s
+      transition:border-color .2s
     }
-    .usage-item:hover{
-      border-color:rgba(212,168,83,0.15);
-      box-shadow:0 4px 20px rgba(0,0,0,0.15)
-    }
+    .usage-item:hover{border-color:#d1d5db}
     .usage-label{
-      font-size:.68rem;font-weight:700;letter-spacing:.05em;
-      text-transform:uppercase;color:var(--accent-dim);
+      font-size:.68rem;font-weight:700;letter-spacing:.04em;
+      text-transform:uppercase;color:var(--text-muted);
       margin-bottom:8px
     }
     .usage-code{
       font-family:'JetBrains Mono',monospace;
-      font-size:.82rem;color:#e6e1cf;
-      background:var(--code-bg);
+      font-size:.82rem;color:var(--text);
+      background:#f9fafb;
       border:1px solid var(--border);
       border-radius:6px;padding:10px 14px;
       overflow-x:auto;margin-top:6px
     }
     .usage-desc{
-      font-size:.85rem;color:var(--text-muted);
+      font-size:.85rem;color:var(--text-secondary);
       margin-top:8px
     }
 
     /* ── options ── */
+    .opt-wrap{
+      overflow-x:auto;
+      border-radius:10px;
+      border:1px solid var(--border)
+    }
     .options-table{
       width:100%;border-collapse:collapse;
       background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:10px;overflow:hidden;
-      font-size:.88rem
+      font-size:.85rem
     }
     .options-table th{
-      font-size:.7rem;font-weight:700;letter-spacing:.06em;
-      text-transform:uppercase;color:var(--text-muted);
+      font-size:.7rem;font-weight:700;letter-spacing:.05em;
+      text-transform:uppercase;color:var(--text-secondary);
       text-align:left;padding:12px 20px;
-      background:rgba(24,26,34,0.5);
+      background:#f9fafb;
       border-bottom:1px solid var(--border)
     }
     .options-table td{
       padding:12px 20px;
-      border-bottom:1px solid rgba(35,38,49,0.4);
-      color:var(--text-muted)
+      border-bottom:1px solid #f3f4f6;
+      color:var(--text-secondary)
     }
     .options-table tr:last-child td{border-bottom:none}
     .options-table td:first-child{
       font-family:'JetBrains Mono',monospace;
-      font-size:.82rem;color:var(--accent);
+      font-size:.8rem;color:var(--accent);
       white-space:nowrap
     }
-    .options-table td:last-child{
-      color:var(--text);font-weight:500
-    }
-    .options-table tr:hover td{background:rgba(212,168,83,0.02)}
+    .options-table td:last-child{color:var(--text);font-weight:500}
+    .options-table tr:hover td{background:#fafbfc}
 
     /* ── footer ── */
     footer{
       border-top:1px solid var(--border);
       padding:40px 0;
       text-align:center;
-      font-size:.82rem;color:var(--text-muted)
+      font-size:.82rem;color:var(--text-secondary)
     }
-    footer a{color:var(--accent);text-decoration:none;transition:color .2s}
-    footer a:hover{color:#e0b85e;text-decoration:underline}
+    footer a{color:var(--accent);text-decoration:none}
+    footer a:hover{text-decoration:underline}
 
-    /* ── reveal animation ── */
-    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+    /* ── reveal ── */
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:translateY(0)}
-    .reveal-d1{transition-delay:0.05s}
-    .reveal-d2{transition-delay:0.12s}
-    .reveal-d3{transition-delay:0.2s}
-    .reveal-d4{transition-delay:0.28s}
+    .reveal-d1{transition-delay:.05s}
+    .reveal-d2{transition-delay:.12s}
+    .reveal-d3{transition-delay:.2s}
+    .reveal-d4{transition-delay:.28s}
 
     /* ── responsive ── */
     @media(max-width:768px){
       nav .container{height:48px}
-      .nav-links a:not(.btn-small){display:none}
+      .hamburger{display:flex}
+      .nav-links{position:fixed;top:48px;left:0;right:0;flex-direction:column;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 24px;gap:12px;display:none;z-index:99}
+      .nav-links.open{display:flex}
       .hero{padding:100px 0 56px}
       section{padding:64px 0}
       .features-grid{grid-template-columns:1fr}
       .usage-grid{grid-template-columns:1fr}
       .options-table td,.options-table th{padding:10px 14px}
-      .options-table td:first-child{font-size:.78rem}
+      .options-table td:first-child{font-size:.75rem}
     }
     @media(max-width:480px){
       .hero h1{font-size:2.2rem}
-      .terminal-widget{margin:0 -12px;border-radius:0}
-      .term-body{padding:12px 14px}
-      .term-body pre{font-size:.75rem}
+      .code-block{margin:0 -12px;border-radius:0}
+      .code-body{padding:14px 16px}
+      .code-body pre{font-size:.75rem}
+    }
+    @media(prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      .reveal{opacity:1;transform:none;transition:none}
     }
   </style>
 </head>
@@ -394,48 +373,49 @@
   <div class="container">
     <a href="#" class="nav-logo">dbsql<span>fmt</span></a>
     <div class="nav-links">
-      <a href="#features">Features</a>
-      <a href="#install">Install</a>
-      <a href="#usage">Usage</a>
-      <a href="#options">Options</a>
-      <a href="https://github.com/badai147/dbsqlfmt" target="_blank" class="btn-small">GitHub</a>
+      <a href="#features">功能</a>
+      <a href="#install">安装</a>
+      <a href="#usage">用法</a>
+      <a href="#options">选项</a>
+      <a href="https://github.com/badai147/dbsqlfmt" target="_blank" rel="noopener noreferrer" class="nav-cta" aria-label="GitHub（在新标签页中打开）">GitHub</a>
     </div>
+    <button class="hamburger" aria-label="切换导航" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
 <!-- ── hero ── -->
 <section class="hero" id="hero">
-  <div class="hero-watermark" aria-hidden="true">SELECT *</div>
+  <div class="hero-bg"></div>
   <div class="container">
-    <div class="hero-badge">✦ v0.1.4</div>
+    <div class="hero-badge">v0.1.4</div>
     <h1>dbsql<span class="accent">fmt</span></h1>
     <p class="sub">SQL 格式化 CLI 工具，自动识别方言，开箱即用</p>
     <div class="tags">
       <span>MySQL</span><span>PostgreSQL</span><span>自动检测</span><span>CLI</span>
     </div>
     <div class="hero-badges">
-      <img src="https://img.shields.io/badge/version-0.1.4-181a22?style=flat&labelColor=232631&color=d4a853" alt="version">
-      <img src="https://img.shields.io/badge/node-%3E%3D18-181a22?style=flat&labelColor=232631&color=2dd4bf" alt="node">
-      <img src="https://img.shields.io/badge/license-MIT-181a22?style=flat&labelColor=232631&color=d4a853" alt="license">
+      <img src="https://img.shields.io/badge/version-0.1.4-e5e7eb?style=flat&labelColor=f3f4f6&color=2563eb" alt="version">
+      <img src="https://img.shields.io/badge/node-%3E%3D18-e5e7eb?style=flat&labelColor=f3f4f6&color=2563eb" alt="node">
+      <img src="https://img.shields.io/badge/license-MIT-e5e7eb?style=flat&labelColor=f3f4f6&color=2563eb" alt="license">
     </div>
     <div class="hero-actions">
-      <a href="https://github.com/badai147/dbsqlfmt" target="_blank" class="btn btn-primary">GitHub</a>
-      <a href="https://www.npmjs.com/package/@badai147/dbsqlfmt" target="_blank" class="btn btn-secondary">npm</a>
+      <a href="https://github.com/badai147/dbsqlfmt" target="_blank" rel="noopener noreferrer" class="btn btn-primary" aria-label="GitHub（在新标签页中打开）">GitHub</a>
+      <a href="https://www.npmjs.com/package/@badai147/dbsqlfmt" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" aria-label="npm（在新标签页中打开）">npm</a>
     </div>
 
-    <div class="terminal-widget">
-      <div class="term-header">
-        <span class="term-dot r"></span>
-        <span class="term-dot y"></span>
-        <span class="term-dot g"></span>
-        <span class="term-title">dbsqlfmt — query.sql</span>
+    <div class="code-block" role="img" aria-label="SQL 格式化前后对比示例">
+      <div class="code-header">
+        <span class="code-dot r"></span>
+        <span class="code-dot y"></span>
+        <span class="code-dot g"></span>
+        <span class="code-title">query.sql</span>
       </div>
-      <div class="term-body">
+      <div class="code-body">
 <pre><span class="cm"># Before</span>
 <span class="kw">SELECT</span> id, name, <span class="fn">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> cnt <span class="kw">FROM</span> users
 <span class="kw">WHERE</span> age <span class="op">></span> <span class="str">18</span> <span class="kw">GROUP BY</span> id, name <span class="kw">HAVING</span> cnt <span class="op">></span> <span class="str">5</span>;
 
-<span class="cm"># dbsqlfmt —after —&gt;</span>
+<span class="cm"># dbsqlfmt —after →</span>
 
 <span class="kw">SELECT</span>
   id,
@@ -449,7 +429,7 @@
   id,
   name
 <span class="kw">HAVING</span>
-  cnt <span class="op">></span> <span class="str">5</span><span class="term-cursor"></span></pre>
+  cnt <span class="op">></span> <span class="str">5</span><span class="code-cursor"></span></pre>
       </div>
     </div>
   </div>
@@ -458,16 +438,16 @@
 <!-- ── features ── -->
 <section id="features">
   <div class="container">
-    <p class="section-label reveal">✦ Features</p>
-    <h2 class="section-title reveal reveal-d1">Built for SQL<br>craftsmanship</h2>
+    <p class="section-label reveal">功能</p>
+    <h2 class="section-title reveal reveal-d1">为 SQL 工匠<br>打造</h2>
     <p class="section-desc reveal reveal-d2">从自动方言检测到大小写精细控制，每个细节都为更好的 SQL 体验设计。</p>
     <div class="features-grid">
-      <div class="feature-card reveal reveal-d1"><div class="feature-icon">♢</div><p class="feature-tag">Dialect</p><h3>双方言支持</h3><p>完整支持 MySQL 和 PostgreSQL 方言语法，一套工具覆盖主流数据库。</p></div>
-      <div class="feature-card reveal reveal-d2"><div class="feature-icon">⚡</div><p class="feature-tag">Auto-detect</p><h3>自动方言检测</h3><p>基于加权评分系统自动识别 SQL 方言类型，无需手动指定 —lang。</p></div>
-      <div class="feature-card reveal reveal-d3"><div class="feature-icon">⇧</div><p class="feature-tag">Format</p><h3>大小写控制</h3><p>关键字、数据类型、函数名、标识符大小写独立控制，默认全部大写。</p></div>
-      <div class="feature-card reveal reveal-d2"><div class="feature-icon">◇</div><p class="feature-tag">Style</p><h3>可配置缩进</h3><p>自定义缩进空格数，2 / 4 / 8 任选，无缝适配你的编码风格。</p></div>
-      <div class="feature-card reveal reveal-d3"><div class="feature-icon">◉</div><p class="feature-tag">Safety</p><h3>Dry-run 模式</h3><p>仅预览格式化结果，不改写源文件。放心试用，零风险。</p></div>
-      <div class="feature-card reveal reveal-d4"><div class="feature-icon">⚙</div><p class="feature-tag">Config</p><h3>配置文件</h3><p>通过 <code style="font-size:.82rem;font-family:'JetBrains Mono',monospace;color:var(--accent)">.dbsqlfmtrc</code> 持久化选项，团队共享同一套配置。</p></div>
+      <div class="feature-card reveal reveal-d1"><div class="feature-icon" aria-hidden="true">♢</div><p class="feature-tag">方言</p><h3>双方言支持</h3><p>完整支持 MySQL 和 PostgreSQL 方言语法，一套工具覆盖主流数据库。</p></div>
+      <div class="feature-card reveal reveal-d2"><div class="feature-icon" aria-hidden="true">◈</div><p class="feature-tag">自动检测</p><h3>自动方言检测</h3><p>基于加权评分系统自动识别 SQL 方言类型，无需手动指定。</p></div>
+      <div class="feature-card reveal reveal-d3"><div class="feature-icon" aria-hidden="true">⇧</div><p class="feature-tag">格式化</p><h3>大小写控制</h3><p>关键字、数据类型、函数名、标识符大小写独立控制，默认全部大写。</p></div>
+      <div class="feature-card reveal reveal-d2"><div class="feature-icon" aria-hidden="true">◇</div><p class="feature-tag">样式</p><h3>可配置缩进</h3><p>自定义缩进空格数，2 / 4 / 8 任选，无缝适配你的编码风格。</p></div>
+      <div class="feature-card reveal reveal-d3"><div class="feature-icon" aria-hidden="true">◉</div><p class="feature-tag">安全</p><h3>预览模式</h3><p>仅预览格式化结果，不改写源文件。放心试用，零风险。</p></div>
+      <div class="feature-card reveal reveal-d4"><div class="feature-icon" aria-hidden="true">▹</div><p class="feature-tag">配置</p><h3>配置文件</h3><p>通过 <code style="font-size:.82rem;font-family:'JetBrains Mono',monospace;color:var(--accent)">.dbsqlfmtrc</code> 持久化选项，团队共享同一套配置。</p></div>
     </div>
   </div>
 </section>
@@ -475,15 +455,15 @@
 <!-- ── install ── -->
 <section id="install">
   <div class="container">
-    <p class="section-label reveal">✦ Install</p>
-    <h2 class="section-title reveal reveal-d1">Get started in<br>one command</h2>
+    <p class="section-label reveal">安装</p>
+    <h2 class="section-title reveal reveal-d1">一条命令<br>即可开始</h2>
     <p class="section-desc reveal reveal-d2">全局安装或本地开发依赖，随你选择。</p>
     <div class="install-block reveal reveal-d2">
-      <div class="install-header"><span class="prompt">$</span> Install dbsqlfmt globally</div>
+      <div class="install-header"><span class="prompt">$</span> 全局安装 dbsqlfmt</div>
       <div class="install-body">
         <div class="line"><span class="prompt">$</span><span class="cmd"> npm i -g @badai147/dbsqlfmt</span><span class="install-cursor"></span></div>
         <div class="line" style="margin-top:2px"><span class="prompt"></span><span class="output">added 1 package in 2s</span></div>
-        <div style="margin-top:8px;border-top:1px solid rgba(35,38,49,0.4);padding-top:8px">
+        <div style="margin-top:8px;border-top:1px solid #f3f4f6;padding-top:8px">
           <div class="line"><span class="prompt">$</span><span class="cmd"> dbsqlfmt --version</span></div>
           <div class="line"><span class="prompt"></span><span class="output">0.1.4</span></div>
         </div>
@@ -495,8 +475,8 @@
 <!-- ── usage ── -->
 <section id="usage">
   <div class="container">
-    <p class="section-label reveal">✦ Usage</p>
-    <h2 class="section-title reveal reveal-d1">Simple by design</h2>
+    <p class="section-label reveal">用法</p>
+    <h2 class="section-title reveal reveal-d1">设计简洁</h2>
     <p class="section-desc reveal reveal-d2">三个常用场景，一看就会。</p>
     <div class="usage-grid">
       <div class="usage-item reveal reveal-d1">
@@ -521,12 +501,12 @@
 <!-- ── options ── -->
 <section id="options">
   <div class="container">
-    <p class="section-label reveal">✦ Options</p>
-    <h2 class="section-title reveal reveal-d1">Every flag<br>documented</h2>
+    <p class="section-label reveal">选项</p>
+    <h2 class="section-title reveal reveal-d1">每个选项<br>都有文档</h2>
     <p class="section-desc reveal reveal-d2">CLI 选项覆盖配置文件中的同名设置。</p>
-    <div class="reveal reveal-d2" style="overflow-x:auto;border-radius:10px;border:1px solid var(--border)">
+    <div class="reveal reveal-d2 opt-wrap">
       <table class="options-table">
-        <thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
+        <thead><tr><th>选项</th><th>说明</th><th>默认</th></tr></thead>
         <tbody>
           <tr><td>-l, --language &lt;lang&gt;</td><td>SQL 方言（mysql / postgresql）</td><td>自动检测</td></tr>
           <tr><td>-i, --indent &lt;size&gt;</td><td>缩进空格数</td><td>2</td></tr>
@@ -546,20 +526,30 @@
 
 <footer>
   <div class="container">
-    <p>MIT License · <a href="https://github.com/badai147/dbsqlfmt" target="_blank">badai147/dbsqlfmt</a></p>
+    <p>MIT 许可证 · <a href="https://github.com/badai147/dbsqlfmt" target="_blank" rel="noopener noreferrer" aria-label="GitHub（在新标签页中打开）">badai147/dbsqlfmt</a></p>
   </div>
 </footer>
 
 <script>
 (function(){
-  const els = document.querySelectorAll('.reveal');
+  var els = document.querySelectorAll('.reveal');
   if (!els.length) return;
-  const obs = new IntersectionObserver(function(entries) {
+  var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) {
       if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   els.forEach(function(el) { obs.observe(el); });
+})();
+(function(){
+  var btn = document.querySelector('.hamburger');
+  var menu = document.querySelector('.nav-links');
+  if (!btn || !menu) return;
+  btn.addEventListener('click', function() {
+    var open = menu.classList.toggle('open');
+    btn.classList.toggle('active');
+    btn.setAttribute('aria-expanded', open);
+  });
 })();
 </script>
 </body>
