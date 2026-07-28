@@ -4,6 +4,9 @@
 - `npm run build` — `tsc`, 编译 `src/` → `dist/`
 - `npm test` — `vitest run`（95 条用例，5 个文件）
 - `npm run test:watch` — `vitest`（监听模式）
+- `npm run docs:dev` — `vitepress dev docs`，本地预览文档
+- `npm run docs:build` — `vitepress build docs`，构建文档站点
+- `npm run docs:preview` — `vitepress preview docs`，预览构建产物
 
 ## 架构
 ```
