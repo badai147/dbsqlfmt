@@ -1,5 +1,10 @@
 # dbsqlfmt
 
+## 重点
+该仓库已不再更新，且建议使用 dbeaver 的开发者们试试 [DBX](https://dbxio.com/cn)。
+
+---
+
 ![Version](https://img.shields.io/badge/version-0.1.4-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.x-blue)
